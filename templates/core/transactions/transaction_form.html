@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Transaction | RESMS{% endblock %}
+{% block content %}
+<h1 class="mb-4">{% if object %}Edit Transaction: {{ object.transaction_code }}{% else %}Add Transaction{% endif %}</h1>
+<p class="text-muted">Completing a sale marks the property Sold; completing a rental marks it Rented. Cancelling releases a Reserved property. Completed or cancelled transactions cannot be reopened.</p>
+<form method="post" class="card card-body">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="row">{% for field in form %}<div class="col-md-6 mb-3">
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-label="required">*</span>{% endif %}</label>
+    {{ field }}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+    {% for error in field.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+  </div>{% endfor %}</div>
+  <div><button class="btn btn-primary" type="submit">Save Transaction</button> <a class="btn btn-outline-secondary" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'core:transaction_list' %}{% endif %}">Cancel</a></div>
+</form>
+{% endblock %}

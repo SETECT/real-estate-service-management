@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}Customers | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Customers</h1>
+  {% if user.role == 'admin' %}<a class="btn btn-primary" href="{% url 'core:customer_create' %}">Add New</a>{% endif %}
+</div>
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-6"><label class="form-label" for="search">Search customers</label><input type="search" class="form-control" name="q" id="search" value="{{ request.GET.q }}" placeholder="Name, phone or email"></div>
+  <div class="col-md-4"><label class="form-label" for="customer-type">Customer type</label><select class="form-select" name="customer_type" id="customer-type"><option value="">All types</option>{% for value, label in type_choices %}<option value="{{ value }}" {% if request.GET.customer_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-2 align-self-end"><button class="btn btn-outline-primary" type="submit">Search</button> <a class="btn btn-outline-secondary" href="{% url 'core:customer_list' %}">Reset</a></div>
+</form>
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead><tr><th>Code</th><th>Full name</th><th>Phone</th><th>Email</th><th>Type</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for customer in customers %}
+      <tr>
+        <td>{{ customer.customer_code }}</td><td><a href="{{ customer.get_absolute_url }}">{{ customer.full_name }}</a></td><td>{{ customer.phone }}</td><td>{{ customer.email|default:'—' }}</td><td>{{ customer.get_customer_type_display }}</td>
+        <td class="text-nowrap">
+          <a class="btn btn-sm btn-outline-primary" href="{{ customer.get_absolute_url }}">View</a>
+          {% if user.role == 'admin' %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'core:customer_update' customer.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'core:customer_delete' customer.pk %}">Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="6" class="text-center text-muted py-4">No customers found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if is_paginated %}
+<nav aria-label="Customer pages"><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{{ filter_query }}&amp;page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+  <li class="page-item active"><span class="page-link" aria-current="page">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{{ filter_query }}&amp;page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

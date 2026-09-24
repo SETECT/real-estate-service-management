@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% block title %}Log in | RESMS{% endblock %}
+{% block content %}
+<div class="card mx-auto" style="max-width: 28rem;">
+  <div class="card-body">
+    <h1 class="h3 mb-4">Log in</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}<div class="mb-3"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>{% endfor %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn-primary" type="submit">Log in</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

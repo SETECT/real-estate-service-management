@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% block title %}Delete Customer | RESMS{% endblock %}
+{% block content %}
+<h1>Delete Customer</h1>
+<p>{{ object.customer_code }} — {{ object.full_name }}</p>
+<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal">Delete Customer</button>
+<a class="btn btn-outline-secondary" href="{{ object.get_absolute_url }}">Cancel</a>
+<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerTitle" aria-describedby="deleteCustomerDescription" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h2 class="modal-title fs-5" id="deleteCustomerTitle">Confirm deletion</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body" id="deleteCustomerDescription">Delete <strong>{{ object.full_name }}</strong> ({{ object.customer_code }})? This cannot be undone. Customers with linked records cannot be deleted.</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+      <form method="post" action="{% url 'core:customer_delete' object.pk %}">{% csrf_token %}<button class="btn btn-danger" type="submit">Confirm Delete</button></form>
+    </div>
+  </div></div>
+</div>
+{% endblock %}
+{% block extra_js %}<script>new bootstrap.Modal(document.getElementById('deleteCustomerModal')).show();</script>{% endblock %}

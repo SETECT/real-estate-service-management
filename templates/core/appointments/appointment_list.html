@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Appointments | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Appointments</h1>
+  <a class="btn btn-primary" href="{% url 'core:appointment_create' %}">Add New</a>
+</div>
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-4"><label class="form-label" for="search">Search appointments</label><input type="search" class="form-control" name="q" id="search" value="{{ request.GET.q }}" placeholder="Code, customer, property or notes"></div>
+  <div class="col-md-3"><label class="form-label" for="status">Status</label><select class="form-select" name="status" id="status"><option value="">All statuses</option>{% for value, label in status_choices %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><label class="form-label" for="agent">Agent</label><select class="form-select" name="agent" id="agent"><option value="">All agents</option>{% for agent in agents %}<option value="{{ agent.pk }}" {% if request.GET.agent == agent.pk|stringformat:'s' %}selected{% endif %}>{{ agent.username }}</option>{% endfor %}</select></div>
+  <div class="col-md-2 align-self-end"><button class="btn btn-outline-primary" type="submit">Search</button> <a class="btn btn-outline-secondary" href="{% url 'core:appointment_list' %}">Reset</a></div>
+</form>
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead><tr><th>Code</th><th>Customer</th><th>Property</th><th>Agent</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for appointment in appointments %}
+      <tr>
+        <td><a href="{{ appointment.get_absolute_url }}">{{ appointment.appointment_code }}</a></td>
+        <td><a href="{{ appointment.customer.get_absolute_url }}">{{ appointment.customer.full_name }}</a></td>
+        <td><a href="{{ appointment.property.get_absolute_url }}">{{ appointment.property.name }}</a></td>
+        <td>{{ appointment.agent }}</td><td>{{ appointment.appointment_date|date:'Y-m-d' }}</td><td>{{ appointment.appointment_time|time:'H:i' }}</td><td>{{ appointment.get_status_display }}</td>
+        <td class="text-nowrap">
+          <a class="btn btn-sm btn-outline-primary" href="{{ appointment.get_absolute_url }}">View</a>
+          {% if user.role == 'admin' or appointment.agent_id == user.pk %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'core:appointment_update' appointment.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'core:appointment_delete' appointment.pk %}">Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="8" class="text-center text-muted py-4">No appointments found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if is_paginated %}
+<nav aria-label="Appointment pages"><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{{ filter_query }}&amp;page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+  <li class="page-item active"><span class="page-link" aria-current="page">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{{ filter_query }}&amp;page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

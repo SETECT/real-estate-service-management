@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ object }} | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-4"><h1>{{ title }} {{ object }}</h1><div><a class="btn btn-outline-secondary" href="{{ list_url }}">Back</a>
+{% if user.role == 'admin' or object.transaction.agent_id == user.pk %}<a class="btn btn-primary" href="{{ update_url }}">Edit</a> <a class="btn btn-outline-danger" href="{{ delete_url }}">Delete</a>{% endif %}</div></div>
+<dl class="row">
+<dt class="col-sm-3">Transaction</dt><dd class="col-sm-9"><a href="{{ object.transaction.get_absolute_url }}">{{ object.transaction }}</a></dd>
+<dt class="col-sm-3">Customer</dt><dd class="col-sm-9"><a href="{{ object.customer.get_absolute_url }}">{{ object.customer.full_name }}</a></dd>
+<dt class="col-sm-3">Amount</dt><dd class="col-sm-9">{{ object.amount|floatformat:2 }}</dd>
+<dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{ object.get_status_display }}</dd>
+{% if kind == 'contract' %}
+<dt class="col-sm-3">Property</dt><dd class="col-sm-9"><a href="{{ object.property.get_absolute_url }}">{{ object.property.name }}</a></dd>
+<dt class="col-sm-3">Type</dt><dd class="col-sm-9">{{ object.get_contract_type_display }}</dd>
+<dt class="col-sm-3">Start date</dt><dd class="col-sm-9">{{ object.start_date|date:'Y-m-d' }}</dd>
+<dt class="col-sm-3">End date</dt><dd class="col-sm-9">{{ object.end_date|date:'Y-m-d'|default:'Not applicable' }}</dd>
+<dt class="col-sm-3">Description</dt><dd class="col-sm-9">{{ object.description|linebreaksbr|default:'—' }}</dd>
+{% else %}
+<dt class="col-sm-3">Payment date</dt><dd class="col-sm-9">{{ object.payment_date|date:'Y-m-d' }}</dd>
+<dt class="col-sm-3">Method</dt><dd class="col-sm-9">{{ object.get_payment_method_display }}</dd>
+<dt class="col-sm-3">Note</dt><dd class="col-sm-9">{{ object.note|linebreaksbr|default:'—' }}</dd>
+{% endif %}
+<dt class="col-sm-3">Created</dt><dd class="col-sm-9">{{ object.created_at }}</dd>
+<dt class="col-sm-3">Updated</dt><dd class="col-sm-9">{{ object.updated_at }}</dd>
+</dl>
+{% endblock %}

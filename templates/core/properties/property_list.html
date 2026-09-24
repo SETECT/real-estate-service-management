@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block title %}Properties | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Properties</h1>
+  <a class="btn btn-primary" href="{% url 'core:property_create' %}">Add New</a>
+</div>
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-4"><label class="form-label" for="search">Search properties</label><input type="search" class="form-control" name="q" id="search" value="{{ request.GET.q }}" placeholder="Name or location"></div>
+  <div class="col-md-3"><label class="form-label" for="status">Status</label><select class="form-select" name="status" id="status"><option value="">All statuses</option>{% for value, label in status_choices %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><label class="form-label" for="property-type">Property type</label><select class="form-select" name="property_type" id="property-type"><option value="">All types</option>{% for value, label in type_choices %}<option value="{{ value }}" {% if request.GET.property_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-2 align-self-end"><button class="btn btn-outline-primary" type="submit">Search</button> <a href="{% url 'core:property_list' %}" class="btn btn-outline-secondary">Reset</a></div>
+</form>
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Location</th><th>Price</th><th>Status</th><th>Agent</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for property in properties %}
+      <tr>
+        <td>{{ property.property_code }}</td><td><a href="{{ property.get_absolute_url }}">{{ property.name }}</a></td><td>{{ property.get_property_type_display }}</td><td>{{ property.location }}</td><td>{{ property.price|floatformat:2 }}</td><td>{{ property.get_status_display }}</td><td>{{ property.assigned_agent|default:'Unassigned' }}</td>
+        <td class="text-nowrap">
+          <a class="btn btn-sm btn-outline-primary" href="{{ property.get_absolute_url }}">View</a>
+          {% if user.role == 'admin' or property.assigned_agent_id == user.pk %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'core:property_update' property.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'core:property_delete' property.pk %}">Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="8" class="text-center text-muted py-4">No properties found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if is_paginated %}
+<nav aria-label="Property pages"><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{{ filter_query }}&amp;page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+  <li class="page-item active"><span class="page-link" aria-current="page">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{{ filter_query }}&amp;page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

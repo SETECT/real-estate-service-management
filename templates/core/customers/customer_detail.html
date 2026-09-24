@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ object.full_name }} | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div><h1>{{ object.full_name }}</h1><p class="text-muted">{{ object.customer_code }}</p></div>
+  <div>
+    <a class="btn btn-outline-secondary" href="{% url 'core:customer_list' %}">Back to Customers</a>
+    {% if user.role == 'admin' %}
+    <a class="btn btn-primary" href="{% url 'core:customer_update' object.pk %}">Edit</a>
+    <a class="btn btn-outline-danger" href="{% url 'core:customer_delete' object.pk %}">Delete</a>
+    {% endif %}
+  </div>
+</div>
+<dl class="row">
+  <dt class="col-sm-3">Phone</dt><dd class="col-sm-9">{{ object.phone }}</dd>
+  <dt class="col-sm-3">Email</dt><dd class="col-sm-9">{{ object.email|default:'Not specified' }}</dd>
+  <dt class="col-sm-3">Address</dt><dd class="col-sm-9">{{ object.address|default:'Not specified'|linebreaksbr }}</dd>
+  <dt class="col-sm-3">Customer type</dt><dd class="col-sm-9">{{ object.get_customer_type_display }}</dd>
+  <dt class="col-sm-3">Created</dt><dd class="col-sm-9">{{ object.created_at|date:'Y-m-d H:i' }}</dd>
+  <dt class="col-sm-3">Updated</dt><dd class="col-sm-9">{{ object.updated_at|date:'Y-m-d H:i' }}</dd>
+</dl>
+<h2 class="h4">Owned properties</h2>
+<ul class="list-group">
+  {% for property in properties %}<li class="list-group-item"><a href="{{ property.get_absolute_url }}">{{ property.property_code }} — {{ property.name }}</a> <span class="text-muted">({{ property.get_status_display }})</span></li>{% empty %}<li class="list-group-item text-muted">No properties linked to this customer.</li>{% endfor %}
+</ul>
+{% endblock %}

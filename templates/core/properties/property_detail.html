@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ object.name }} | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div><h1>{{ object.name }}</h1><p class="text-muted">{{ object.property_code }}</p></div>
+  <div>
+    <a class="btn btn-outline-secondary" href="{% url 'core:property_list' %}">Back to Properties</a>
+    {% if user.role == 'admin' or object.assigned_agent_id == user.pk %}
+    <a class="btn btn-primary" href="{% url 'core:property_update' object.pk %}">Edit</a>
+    <a class="btn btn-outline-danger" href="{% url 'core:property_delete' object.pk %}">Delete</a>
+    {% endif %}
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-md-5">
+    {% if object.image %}<img class="img-fluid rounded" src="{{ object.image.url }}" alt="{{ object.name }}">{% else %}<div class="border rounded p-5 text-center text-muted">No image uploaded.</div>{% endif %}
+  </div>
+  <div class="col-md-7">
+    <dl class="row">
+      <dt class="col-sm-4">Type</dt><dd class="col-sm-8">{{ object.get_property_type_display }}</dd>
+      <dt class="col-sm-4">Location</dt><dd class="col-sm-8">{{ object.location }}</dd>
+      <dt class="col-sm-4">Price</dt><dd class="col-sm-8">{{ object.price|floatformat:2 }}</dd>
+      <dt class="col-sm-4">Size</dt><dd class="col-sm-8">{{ object.size|floatformat:2 }} m²</dd>
+      <dt class="col-sm-4">Bedrooms</dt><dd class="col-sm-8">{{ object.bedrooms }}</dd>
+      <dt class="col-sm-4">Bathrooms</dt><dd class="col-sm-8">{{ object.bathrooms }}</dd>
+      <dt class="col-sm-4">Status</dt><dd class="col-sm-8">{{ object.get_status_display }}</dd>
+      <dt class="col-sm-4">Owner</dt><dd class="col-sm-8">{% if object.owner %}<a href="{{ object.owner.get_absolute_url }}">{{ object.owner.full_name }}</a>{% else %}Not specified{% endif %}</dd>
+      <dt class="col-sm-4">Assigned agent</dt><dd class="col-sm-8">{{ object.assigned_agent|default:'Unassigned' }}</dd>
+      <dt class="col-sm-4">Created</dt><dd class="col-sm-8">{{ object.created_at|date:'Y-m-d H:i' }}</dd>
+      <dt class="col-sm-4">Updated</dt><dd class="col-sm-8">{{ object.updated_at|date:'Y-m-d H:i' }}</dd>
+    </dl>
+    <h2 class="h5">Description</h2>
+    {{ object.description|default:'No description provided.'|linebreaks }}
+  </div>
+</div>
+{% endblock %}

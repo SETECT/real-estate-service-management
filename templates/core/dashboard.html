@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard | RESMS{% endblock %}
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+<div class="row g-3 mb-4">{% for label,value in cards %}<div class="col-sm-6 col-xl-3"><div class="card h-100"><div class="card-body"><h2 class="h6 text-muted">{{ label }}</h2><p class="fs-3 mb-0">{{ value }}</p></div></div></div>{% endfor %}</div>
+<section class="card"><div class="card-body"><h2 class="h4">Properties by status</h2>
+<div style="max-width: 650px; height: 320px"><canvas id="propertyChart" role="img" aria-label="Property counts by status. The same counts are listed below."></canvas></div>
+<dl class="row mt-3 mb-0"><dt class="col-sm-3">Available</dt><dd class="col-sm-9">{{ chart_values.0 }}</dd><dt class="col-sm-3">Reserved</dt><dd class="col-sm-9">{{ chart_values.1 }}</dd><dt class="col-sm-3">Sold</dt><dd class="col-sm-9">{{ chart_values.2 }}</dd><dt class="col-sm-3">Rented</dt><dd class="col-sm-9">{{ chart_values.3 }}</dd></dl>
+</div></section>
+{{ chart_labels|json_script:'property-labels' }}{{ chart_values|json_script:'property-values' }}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script>
+if (typeof Chart !== 'undefined') {
+  new Chart(document.getElementById('propertyChart'), {
+    type: 'bar',
+    data: {labels: JSON.parse(document.getElementById('property-labels').textContent), datasets: [{label: 'Properties', data: JSON.parse(document.getElementById('property-values').textContent), backgroundColor: ['#198754', '#ffc107', '#dc3545', '#0d6efd']}]},
+    options: {responsive: true, maintainAspectRatio: false, scales: {y: {beginAtZero: true, ticks: {precision: 0}}}, plugins: {legend: {display: false}}}
+  });
+}
+</script>
+{% endblock %}

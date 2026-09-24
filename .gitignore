@@ -1,0 +1,10 @@
+.env
+.venv/
+.venv312/
+.python/
+.uv-cache/
+media/
+db.sqlite3
+__pycache__/
+*.py[cod]
+*.log

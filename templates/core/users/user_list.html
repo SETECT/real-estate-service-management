@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% block title %}Users | RESMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Users</h1>
+  {% if user.is_staff %}<a class="btn btn-primary" href="{% url 'admin:core_user_add' %}">Add New</a>{% endif %}
+</div>
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-6"><label class="form-label" for="user-search">Search users</label><input class="form-control" id="user-search" name="q" value="{{ request.GET.q }}" placeholder="Username or email"></div>
+  <div class="col-md-3"><label class="form-label" for="role">Role</label><select class="form-select" id="role" name="role"><option value="">All roles</option><option value="admin" {% if request.GET.role == 'admin' %}selected{% endif %}>Admin</option><option value="agent" {% if request.GET.role == 'agent' %}selected{% endif %}>Agent</option></select></div>
+  <div class="col-md-3 align-self-end"><button class="btn btn-outline-primary" type="submit">Search</button></div>
+</form>
+<table class="table table-striped table-hover">
+  <thead><tr><th>Username</th><th>Email</th><th>Role</th></tr></thead>
+  <tbody>{% for account in object_list %}<tr><td>{{ account.username }}</td><td>{{ account.email|default:'—' }}</td><td>{{ account.get_role_display }}</td></tr>{% empty %}<tr><td colspan="3">No users found.</td></tr>{% endfor %}</tbody>
+</table>
+{% if is_paginated %}<nav aria-label="User pages">{% if page_obj.has_previous %}<a href="?q={{ request.GET.q|urlencode }}&amp;role={{ request.GET.role|urlencode }}&amp;page={{ page_obj.previous_page_number }}">Previous</a>{% endif %} Page {{ page_obj.number }} of {{ paginator.num_pages }} {% if page_obj.has_next %}<a href="?q={{ request.GET.q|urlencode }}&amp;role={{ request.GET.role|urlencode }}&amp;page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+{% endblock %}

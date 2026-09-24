@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% block title %}Delete Inquiry | RESMS{% endblock %}
+{% block content %}
+<h1>Delete Inquiry</h1>
+<p>{{ object.inquiry_code }} — {{ object.customer.full_name }} / {{ object.property.name }}</p>
+<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteInquiryModal">Delete Inquiry</button>
+<a class="btn btn-outline-secondary" href="{{ object.get_absolute_url }}">Cancel</a>
+<div class="modal fade" id="deleteInquiryModal" tabindex="-1" aria-labelledby="deleteInquiryTitle" aria-describedby="deleteInquiryDescription" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h2 class="modal-title fs-5" id="deleteInquiryTitle">Confirm deletion</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body" id="deleteInquiryDescription">Delete inquiry <strong>{{ object.inquiry_code }}</strong>? This cannot be undone.</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+      <form method="post" action="{% url 'core:inquiry_delete' object.pk %}">{% csrf_token %}<button class="btn btn-danger" type="submit">Confirm Delete</button></form>
+    </div>
+  </div></div>
+</div>
+{% endblock %}
+{% block extra_js %}<script>new bootstrap.Modal(document.getElementById('deleteInquiryModal')).show();</script>{% endblock %}
